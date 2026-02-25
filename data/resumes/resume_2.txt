@@ -1,0 +1,3 @@
+Experienced data analyst proficient in SQL, Tableau, and Python. 
+Strong background in data cleaning, feature engineering, and visualization. 
+Worked with large datasets to derive insights and automate reporting processes.

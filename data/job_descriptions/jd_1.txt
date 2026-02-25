@@ -1,0 +1,3 @@
+We are looking for a Machine Learning Engineer skilled in Python and NLP. 
+The ideal candidate should have experience with scikit-learn or TensorFlow, and be able to deploy models using FastAPI or similar frameworks. 
+Knowledge of text similarity and semantic search is a plus.

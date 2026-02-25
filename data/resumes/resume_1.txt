@@ -1,0 +1,3 @@
+I am a machine learning engineer skilled in Python, scikit-learn, and TensorFlow. 
+I have experience in building classification models, NLP pipelines, and API integration using FastAPI. 
+Previously worked on projects involving resume screening and text similarity.

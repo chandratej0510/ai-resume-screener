@@ -1,0 +1,32 @@
+<div class="container">
+  <h1>AI Resume Screener</h1>
+
+  <div class="panel">
+    <h2>Job Description</h2>
+    <textarea [(ngModel)]="jobDescription" rows="8" placeholder="Paste job description here"></textarea>
+  </div>
+
+  <div class="panel">
+    <h2>Resumes</h2>
+
+    <div *ngFor="let resume of resumes; let i = index">
+      <textarea [(ngModel)]="resumes[i]" rows="6" placeholder="Paste resume {{ i+1 }}"></textarea>
+    </div>
+
+    <button (click)="addResume()">+ Add Resume</button>
+  </div>
+
+  <button class="match-btn" (click)="matchResumes()">Match Resumes</button>
+
+  <div *ngIf="results.length > 0" class="results">
+    <h2>Results</h2>
+    
+    <div *ngFor="let r of results">
+      <strong>Resume {{ r.index + 1 }}</strong>
+      <div class="score-bar">
+        <div class="score-fill" [style.width.%]="r.score * 100"></div>
+      </div>
+      <p>Score: {{ r.score | number:'1.2-2' }}</p>
+    </div>
+  </div>
+</div>
