@@ -21,8 +21,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/ping")
-def ping():
-    return {"msg": "ok"}
+@app.get("/")
+def health_check():
+    return {"status": "ok", "message": "AI Resume Screener Backend is running!"}
 
 app.include_router(api_router, prefix=settings.API_V1_STR)

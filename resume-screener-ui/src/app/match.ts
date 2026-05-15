@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../environments/environment';
 
 export interface MatchResult {
   filename: string;
@@ -18,7 +19,7 @@ export interface MatchResponse {
 })
 export class MatchService {
 
-  backendUrl = "http://127.0.0.1:8000/api/v1/match";
+  backendUrl = `${environment.apiUrl}/api/v1/match`;
 
   constructor(private http: HttpClient) {}
 
