@@ -3,3 +3,7 @@ uvicorn
 sentence-transformers
 torch
 numpy
+pypdf
+python-multipart
+pydantic-settings
+pydantic

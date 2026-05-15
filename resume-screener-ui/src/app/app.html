@@ -1,32 +1,103 @@
-<div class="container">
-  <h1>AI Resume Screener</h1>
-
-  <div class="panel">
-    <h2>Job Description</h2>
-    <textarea [(ngModel)]="jobDescription" rows="8" placeholder="Paste job description here"></textarea>
-  </div>
-
-  <div class="panel">
-    <h2>Resumes</h2>
-
-    <div *ngFor="let resume of resumes; let i = index">
-      <textarea [(ngModel)]="resumes[i]" rows="6" placeholder="Paste resume {{ i+1 }}"></textarea>
+<div class="app-container">
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon"></div>
+      <h1>AI Resume Screener</h1>
     </div>
+    <p class="subtitle">Intelligent semantic candidate matching</p>
+  </header>
 
-    <button (click)="addResume()">+ Add Resume</button>
-  </div>
-
-  <button class="match-btn" (click)="matchResumes()">Match Resumes</button>
-
-  <div *ngIf="results.length > 0" class="results">
-    <h2>Results</h2>
-    
-    <div *ngFor="let r of results">
-      <strong>Resume {{ r.index + 1 }}</strong>
-      <div class="score-bar">
-        <div class="score-fill" [style.width.%]="r.score * 100"></div>
+  <main class="main-content">
+    <div class="panel input-panel">
+      
+      <div class="form-group">
+        <label for="jd">Job Description</label>
+        <textarea id="jd" [(ngModel)]="jobDescription" rows="6" placeholder="Paste the complete job description here..."></textarea>
       </div>
-      <p>Score: {{ r.score | number:'1.2-2' }}</p>
+
+      <div class="form-group">
+        <label>Upload Resumes (PDF only)</label>
+        <div class="upload-zone" [class.has-files]="selectedFiles.length > 0">
+          <input type="file" id="file-upload" multiple accept=".pdf" (change)="onFileSelected($event)" class="file-input">
+          <label for="file-upload" class="upload-label">
+            <svg class="upload-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+            <span class="upload-text">Click to select or drag PDF files here</span>
+            <span class="upload-hint" *ngIf="selectedFiles.length === 0">No files selected</span>
+            <span class="upload-hint success-hint" *ngIf="selectedFiles.length > 0">{{ selectedFiles.length }} file(s) ready for analysis</span>
+          </label>
+        </div>
+        
+        <div class="file-list" *ngIf="selectedFiles.length > 0">
+          <div class="file-item" *ngFor="let file of selectedFiles; let i = index">
+            <div class="file-info">
+              <svg class="file-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+              <span class="file-name">{{ file.name }}</span>
+            </div>
+            <button class="remove-btn" (click)="removeFile(i)" title="Remove file">&times;</button>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="errorMessage" class="error-alert">
+        {{ errorMessage }}
+      </div>
+
+      <button class="primary-btn" (click)="matchResumes()" [disabled]="isLoading">
+        <span *ngIf="!isLoading">Match Candidates</span>
+        <span *ngIf="isLoading" class="spinner"></span>
+        <span *ngIf="isLoading">Processing {{ selectedFiles.length }} Resumes...</span>
+      </button>
+
     </div>
-  </div>
+
+    <div class="panel results-panel" *ngIf="results.length > 0 || isLoading">
+      <div class="results-header">
+        <h2>Ranked Candidates</h2>
+        <span class="status-badge processing" *ngIf="isLoading">Processing</span>
+        <span class="status-badge ranked" *ngIf="!isLoading && results.length > 0">Ranked</span>
+      </div>
+      
+      <div class="loading-skeleton" *ngIf="isLoading">
+        <div class="skeleton-row"></div>
+        <div class="skeleton-row"></div>
+        <div class="skeleton-row"></div>
+      </div>
+
+      <div class="results-list" *ngIf="!isLoading && results.length > 0">
+        <div class="result-card expanded-card" *ngFor="let r of results; let i = index" [style.animationDelay]="i * 0.1 + 's'">
+          <div class="card-header">
+            <div class="header-left">
+              <div class="rank-badge" [class.top-match]="i === 0">#{{ i + 1 }}</div>
+              <div class="candidate-title-group">
+                <h3 class="candidate-name">{{ r.filename }}</h3>
+                <span class="top-match-indicator" *ngIf="i === 0">⭐ Top Match</span>
+              </div>
+            </div>
+            <div class="header-right">
+              <div class="match-score-badge" [ngClass]="{'high-match-badge': r.score >= 0.7, 'med-match-badge': r.score >= 0.4 && r.score < 0.7, 'low-match-badge': r.score < 0.4}">
+                {{ r.score * 100 | number:'1.0-0' }}% Match
+              </div>
+            </div>
+          </div>
+          
+          <div class="candidate-body">
+            <div class="skills-section" *ngIf="r.skills && r.skills.length > 0">
+              <span class="skill-chip" *ngFor="let skill of r.skills">{{ skill }}</span>
+            </div>
+            
+            <div class="summary-section" *ngIf="r.summary">
+              <div class="summary-title">✨ AI Highlight</div>
+              <p class="summary-text">{{ r.summary }}</p>
+            </div>
+            
+            <div class="score-container mt-3">
+              <div class="score-bar-bg">
+                <div class="score-bar-fill" [style.width.%]="r.score * 100" [ngClass]="{'high-match': r.score >= 0.7, 'med-match': r.score >= 0.4 && r.score < 0.7, 'low-match': r.score < 0.4}"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
 </div>

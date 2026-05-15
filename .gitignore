@@ -13,3 +13,7 @@ dist/
 # OS
 .DS_Store
 .vscode/
+
+# Data & Resumes
+data/
+*.pdf
